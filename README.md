@@ -17,7 +17,7 @@
 # Using custom paths to generate files
 
 - Press `ctrl+shif+p` command and search for `Generate Next Config` and click enter.
-  ![Alt text](assets/7.png)
+  ![Alt text](assets/7.1.png)
 - A file named `gen.json` will be created to the root of the directory project.
   ![Alt text](assets/8.png)
 - From the config you can specify the custom folder paths where you want to generate files
