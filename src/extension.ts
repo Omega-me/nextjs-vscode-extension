@@ -76,7 +76,7 @@ export function activate(context: vscode.ExtensionContext) {
           ? `${f}${config.pagesPath}\\${data.pagePath?.toLowerCase()}`
           : `${f}\\src\\app\\${data.pagePath?.toLowerCase()}`;
         const pageUri = vscode.Uri.file(paths.pagePath);
-        await createFile(pageUri, 'page.tsx', generatePage(data));
+        await createFile(pageUri, 'page.tsx', generatePage(data, config));
         await createFile(pageUri, 'utils.ts', generateUtil(data));
 
         if (data.hasModule) {
@@ -106,8 +106,6 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.window.showErrorMessage('Next code generator: Working folder not found, open a folder an try again');
       }
     }
-
-    console.log(config);
   });
   context.subscriptions.push(generatePageDisposable);
 

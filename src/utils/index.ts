@@ -36,7 +36,7 @@ export const checkIfEmptyString = (str?: string) => {
   return false;
 };
 
-export const generatePage = (data: IData) => {
+export const generatePage = (data: IData, config: IConfig) => {
   let pageContent = '';
   if (data.hasModule) {
     pageContent = `
