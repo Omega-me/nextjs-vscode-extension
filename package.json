@@ -22,6 +22,10 @@
       {
         "command": "nextcodegen.generate",
         "title": "Generate Next Page"
+      },
+      {
+        "command": "nextcodegen.generate_config",
+        "title": "Generate Next Config"
       }
     ]
   },

@@ -10,6 +10,13 @@ export interface IData {
   hasParams?: boolean;
   hasMultipleParams: boolean;
 }
+
+export interface IConfig {
+  pagesPath?: string;
+  modulesPath?: string;
+  componentsPath?: string;
+}
+
 export const capitalize = (str: string) => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
@@ -17,6 +24,16 @@ export const capitalize = (str: string) => {
 export const getPageName = (str: string) => {
   const arr = str.split('/');
   return arr[arr.length - 1];
+};
+
+export const checkIfEmptyString = (str?: string) => {
+  if (str === undefined) {
+    return true;
+  }
+  if (str.trim() === '') {
+    return true;
+  }
+  return false;
 };
 
 export const generatePage = (data: IData) => {

@@ -12,9 +12,19 @@
   ![Alt text](assets/5.png)
   ![Alt text](assets/6.png)
 
-* Alongside it will be generated a utils file per page and if choosed it will be generated a module file and a component file
+- Alongside it will be generated a utils file per page and if choosed it will be generated a module file and a component file
 
-### To change directory for generating pages, modules and components, you will need to create a config file called gen.json in the root of the project and specify the paths you want to change
+# Using custom paths to generate files
+
+- Press `ctrl+shif+p` command and search for `Generate Next Config` and click enter.
+  ![Alt text](assets/7.png)
+- A file named `gen.json` will be created to the root of the directory project.
+  ![Alt text](assets/8.png)
+- From the config you can specify the custom folder paths where you want to generate files
+  ![Alt text](assets/9.png)
+- Leaving path as empty strings or removing from the config file will fallback to the default paths
+
+### `gen.json` file structure
 
 ```json
 {
