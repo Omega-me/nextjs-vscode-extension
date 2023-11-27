@@ -7,6 +7,7 @@ export interface IData {
   hasModule?: boolean;
   componentName?: string;
   moduleName?: string;
+  moduleFile?: string;
   hasParams?: boolean;
   hasMultipleParams: boolean;
 }
@@ -36,35 +37,44 @@ export const checkIfEmptyString = (str?: string) => {
   return false;
 };
 
+export const checkValidConfigPath = (config: IConfig) => {
+  if (
+    (!config.pagesPath?.startsWith('/src') && config.pagesPath?.trim() !== '') ||
+    (!config.modulesPath?.startsWith('/src') && config.modulesPath?.trim() !== '') ||
+    (!config.componentsPath?.startsWith('/src') && config.componentsPath?.trim() !== '')
+  ) {
+    return false;
+  }
+  return true;
+};
+
 export const generatePage = (data: IData, config: IConfig) => {
   let pageContent = '';
   if (data.hasModule) {
-    pageContent = `
-      import { PageProps, prefetchQuery } from './utils';
-      import { ${data.moduleName} } from '@/containers/modules';
-      import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
+    pageContent = `import { PageProps, prefetchQuery } from './${data.pageName}.utils';
+import { ${data.moduleName} } from ${!checkIfEmptyString(config.modulesPath) ? "'" + config.modulesPath?.replace('/src', '@') + "'" : "'@/containers/modules'"};
+import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 
-      const ${data.pageName} = async (props: PageProps) => {
-      const queryClient = await prefetchQuery(props);
+const ${data.pageName} = async (props: PageProps) => {
+  const queryClient = await prefetchQuery(props);
 
-      return (
-        <HydrationBoundary state={dehydrate(queryClient)}>
-          <${data.moduleName} />
-        </HydrationBoundary>
-      );
-    };
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <${data.moduleName} />
+    </HydrationBoundary>
+  );
+};
 
-    export default ${data.pageName};`;
+export default ${data.pageName};`;
   } else {
     pageContent = `
-      import { PageProps } from './utils';
+import { PageProps } from './utils';
 
-      const ${data.pageName} = async (props: PageProps) => {
-        return <div>${data.pageName}</div>;
-      };
+const ${data.pageName} = async (props: PageProps) => {
+  return <div>${data.pageName}</div>;
+};
 
-      export default ${data.pageName};
-    `;
+export default ${data.pageName};`;
   }
 
   return pageContent;
@@ -75,56 +85,64 @@ export const generateUtil = (data: IData) => {
   const paramsType = data.hasParams ? (data.hasMultipleParams ? `params: { ${data.page}: string[] };` : `params: { ${data.page}: string };`) : '';
 
   if (data.hasModule) {
-    utilContent = `
-      import { IPageProps } from '@/common/interfaces';
-      import { QueryClient } from '@tanstack/react-query';
+    utilContent = `import { IPageProps } from '@/common/interfaces';
+import { QueryClient } from '@tanstack/react-query';
 
-      export interface PageProps extends IPageProps {
-        ${paramsType}
-      }
+export interface PageProps extends IPageProps {
+  ${paramsType}
+}
 
-      export const prefetchQuery = async (props: PageProps): Promise<QueryClient> => {
-        const queryClient = new QueryClient();
-
-        return queryClient;
-      };
-    `;
+export const prefetchQuery = async (props: PageProps): Promise<QueryClient> => {
+  const queryClient = new QueryClient();
+    
+  return queryClient;
+};`;
   } else {
     utilContent = `
-        import { IPageProps } from '@/common/interfaces';
+import { IPageProps } from '@/common/interfaces';
   
-        export interface PageProps extends IPageProps {
-          ${paramsType}
-        }
-      `;
+export interface PageProps extends IPageProps {
+  ${paramsType}
+}`;
   }
 
   return utilContent;
 };
 
-export const generateModule = (data: IData) => {
-  return `
-  'use client';
-  import { ${data.componentName} } from '@/containers/components';
-
-  const ${data.moduleName} = () => {
-    return <${data.componentName} />;
+export const generateModule = (
+  data: IData | { module?: string; moduleName?: string; moduleFile?: string; hasComponent?: boolean; componentName?: string },
+  config: IConfig,
+) => {
+  return `'use client';
+import { ${data.componentName} } from ${
+    !checkIfEmptyString(config.componentsPath) ? "'" + config.componentsPath?.replace('/src', '@') + "'" : "'@/containers/components'"
   };
 
-  export default ${data.moduleName};
-  `;
+const ${data.moduleName} = () => {
+  return <${data.componentName} />;
 };
 
-export const generateComponent = (data: IData) => {
-  return `
-  'use client';
+export default ${data.moduleName};`;
+};
 
-  interface ${data.componentName}Props {}
+export const generateComponent = (
+  data: IData | { module?: string; moduleName?: string; moduleFile?: string; hasComponent?: boolean; componentName?: string },
+) => {
+  return `'use client';
+import s from './${data.componentName?.toLowerCase()}.module.scss';
 
-  const ${data.componentName}: React.FC<${data.componentName}Props> = props => {
-    return <div>${data.componentName}</div>;
-  };
+interface ${data.componentName}Props {}
 
-  export default ${data.componentName};
-  `;
+const ${data.componentName}: React.FC<${data.componentName}Props> = props => {
+  return <div className={s.${data.componentName?.toLowerCase()}}>${data.componentName}</div>;
+};
+
+export default ${data.componentName};`;
+};
+
+export const generateCssFile = (
+  data: IData | { module?: string; moduleName?: string; moduleFile?: string; hasComponent?: boolean; componentName?: string },
+) => {
+  return `// .${data.componentName?.toLowerCase()} {
+// }`;
 };

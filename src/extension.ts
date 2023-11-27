@@ -1,114 +1,224 @@
 import vscode from 'vscode';
-import { IConfig, IData, capitalize, checkIfEmptyString, generateComponent, generateModule, generatePage, generateUtil, getPageName } from './utils';
+import {
+  IConfig,
+  IData,
+  capitalize,
+  checkIfEmptyString,
+  checkValidConfigPath,
+  generateComponent,
+  generateCssFile,
+  generateModule,
+  generatePage,
+  generateUtil,
+  getPageName,
+} from './utils';
 
 export function activate(context: vscode.ExtensionContext) {
-  let config: IConfig = {};
+  // generate page, page util, module and component
   const generatePageDisposable = vscode.commands.registerCommand('nextcodegen.generate', async () => {
-    try {
-      const fileUri = getFileUri('/gen.json');
-      if (fileUri) {
-        config = JSON.parse(await readFileContent(fileUri));
-      }
-    } catch (error) {
-      config = {
-        pagesPath: '',
-        modulesPath: '',
-        componentsPath: '',
+    const config = await getConfig();
+
+    if (config) {
+      let pascalPage: string = '';
+      const data: IData = {
+        hasParams: false,
+        hasMultipleParams: false,
       };
-    }
-
-    let pascalPage: string;
-    const data: IData = {
-      hasParams: false,
-      hasMultipleParams: false,
-    };
-    data.pagePath = await vscode.window.showInputBox({
-      prompt: 'Enter page path',
-      placeHolder: 'pagepath',
-    });
-    if (data.pagePath) {
-      data.page = getPageName(data.pagePath);
-      data.pageOriginalName = data.page;
-      data.page = data.page?.toLowerCase();
-      data.pageFolder = data.page;
-    }
-
-    if (data.page && data.pageOriginalName) {
-      const pageParams = data.page.split('');
-      if (pageParams[0] === '[' && pageParams[pageParams.length - 1] === ']') {
-        data.hasParams = true;
-        if (data.hasParams) {
-          if (data.page.includes('...')) {
-            data.hasMultipleParams = true;
-          } else {
-            data.hasMultipleParams = false;
-          }
-        }
-        const rgex: RegExp = /[\[\]]|\.\.\./g;
-        data.page = data.page.replace(rgex, '');
-        data.pageOriginalName = data.pageOriginalName.replace(rgex, '');
-      } else {
-        data.hasParams = false;
-        data.hasMultipleParams = false;
-      }
-      pascalPage = capitalize(data.pageOriginalName);
-      data.pageName = pascalPage + 'Page';
-      const moduleChecker = await vscode.window.showInputBox({
-        prompt: 'Does page has a module and react query support?',
-        value: 'Yes',
+      data.pagePath = await vscode.window.showInputBox({
+        prompt: 'Enter page path',
+        placeHolder: 'pagepath',
       });
-      data.hasModule = moduleChecker === 'Yes' ? true : false;
-      if (data.hasModule) {
-        data.moduleName = `${pascalPage}Module`;
-        data.componentName = pascalPage;
+      if (data.pagePath) {
+        data.page = getPageName(data.pagePath);
+        data.pageOriginalName = data.page;
+        data.page = data.page?.toLowerCase();
+        data.pageFolder = data.page;
       }
-    } else {
-      vscode.window.showInformationMessage('You canceled the input.');
-    }
 
-    const paths: { pagePath?: string; modulePath?: string; moduleFolderPath?: string; componentsFolderPath?: string; componentPath?: string } = {};
-    if (data.page) {
-      if (vscode.workspace.workspaceFolders !== undefined) {
-        let f = vscode.workspace.workspaceFolders[0].uri.fsPath;
-
-        // Create page and util files
-        paths.pagePath = !checkIfEmptyString(config.pagesPath)
-          ? `${f}${config.pagesPath}\\${data.pagePath?.toLowerCase()}`
-          : `${f}\\src\\app\\${data.pagePath?.toLowerCase()}`;
-        const pageUri = vscode.Uri.file(paths.pagePath);
-        await createFile(pageUri, 'page.tsx', generatePage(data, config));
-        await createFile(pageUri, 'utils.ts', generateUtil(data));
-
-        if (data.hasModule) {
-          // Create module and component files
-          paths.modulePath = !checkIfEmptyString(config.modulesPath)
-            ? `${f}${config.modulesPath}\\${data.page}`
-            : `${f}\\src\\containers\\modules\\${data.page}`;
-          paths.componentPath = !checkIfEmptyString(config.componentsPath)
-            ? `${f}${config.componentsPath}\\${data.page}`
-            : `${f}\\src\\containers\\components\\${data.page}`;
-          const moduleUri = vscode.Uri.file(paths.modulePath);
-          const componentUri = vscode.Uri.file(paths.componentPath);
-
-          await createFile(moduleUri, `${data.moduleName}.tsx`, generateModule(data));
-          await createFile(componentUri, `${data.componentName}.tsx`, generateComponent(data));
-
-          // export module and component file
-          paths.moduleFolderPath = config.modulesPath ? `${f}${config.modulesPath}` : `${f}\\src\\containers\\modules`;
-          paths.componentsFolderPath = config.componentsPath ? `${f}${config.componentsPath}` : `${f}\\src\\containers\\components`;
-          const moduleFolderUri = vscode.Uri.file(paths.moduleFolderPath);
-          const componentForlderUri = vscode.Uri.file(paths.componentsFolderPath);
-          await exportContainers(moduleFolderUri, `export { default as ${data.moduleName} } from './${data.page}/${data.moduleName}';`);
-          await exportContainers(componentForlderUri, `export { default as ${data.componentName} } from './${data.page}/${data.componentName}';`);
+      if (data.page && data.pageOriginalName) {
+        const pageParams = data.page.split('');
+        if (pageParams[0] === '[' && pageParams[pageParams.length - 1] === ']') {
+          data.hasParams = true;
+          if (data.hasParams) {
+            if (data.page.includes('...')) {
+              data.hasMultipleParams = true;
+            } else {
+              data.hasMultipleParams = false;
+            }
+          }
+          const rgex: RegExp = /[\[\]]|\.\.\./g;
+          data.page = data.page.replace(rgex, '');
+          data.pageOriginalName = data.pageOriginalName.replace(rgex, '');
+        } else {
+          data.hasParams = false;
+          data.hasMultipleParams = false;
         }
-        vscode.window.showInformationMessage(f);
+        pascalPage = capitalize(data.pageOriginalName);
+        data.pageName = pascalPage + 'Page';
+        const moduleChecker = await vscode.window.showInputBox({
+          prompt: 'Does page has a module and react query support?',
+          value: 'Yes',
+        });
+        data.hasModule = moduleChecker === 'Yes' ? true : false;
+        if (data.hasModule) {
+          data.moduleName = `${pascalPage}Module`;
+          data.moduleFile = `${pascalPage}.module`;
+          data.componentName = pascalPage;
+        }
       } else {
-        vscode.window.showErrorMessage('Next code generator: Working folder not found, open a folder an try again');
+        vscode.window.showInformationMessage('You canceled the input.');
+      }
+
+      const paths: { pagePath?: string; modulePath?: string; moduleFolderPath?: string; componentsFolderPath?: string; componentPath?: string } = {};
+      if (data.page) {
+        if (vscode.workspace.workspaceFolders !== undefined) {
+          let f = vscode.workspace.workspaceFolders[0].uri.fsPath;
+
+          // Create page and util files
+          paths.pagePath = !checkIfEmptyString(config.pagesPath)
+            ? `${f}${config.pagesPath}\\${data.pagePath?.toLowerCase()}`
+            : `${f}\\src\\app\\${data.pagePath?.toLowerCase()}`;
+          const pageUri = vscode.Uri.file(paths.pagePath);
+          await createFile(pageUri, 'page.tsx', generatePage(data, config));
+          await createFile(pageUri, `${data.pageName}.utils.ts`, generateUtil(data));
+
+          if (data.hasModule) {
+            // Create module and component files4
+            paths.modulePath = !checkIfEmptyString(config.modulesPath)
+              ? `${f}${config.modulesPath}\\${data.page}`
+              : `${f}\\src\\containers\\modules\\${data.page}`;
+            paths.componentPath = !checkIfEmptyString(config.componentsPath)
+              ? `${f}${config.componentsPath}\\${data.page}`
+              : `${f}\\src\\containers\\components\\${data.page}`;
+            const moduleUri = vscode.Uri.file(paths.modulePath);
+            const componentUri = vscode.Uri.file(paths.componentPath);
+
+            await createFile(moduleUri, `${data.moduleFile}.tsx`, generateModule(data, config));
+            await createFile(componentUri, `${data.componentName}.tsx`, generateComponent(data));
+            await createFile(componentUri, `${data.componentName?.toLowerCase()}.module.scss`, generateCssFile(data));
+
+            // export module and component file
+            paths.moduleFolderPath = config.modulesPath ? `${f}${config.modulesPath}` : `${f}\\src\\containers\\modules`;
+            paths.componentsFolderPath = config.componentsPath ? `${f}${config.componentsPath}` : `${f}\\src\\containers\\components`;
+            const moduleFolderUri = vscode.Uri.file(paths.moduleFolderPath);
+            const componentForlderUri = vscode.Uri.file(paths.componentsFolderPath);
+            await exportContainers(moduleFolderUri, `export { default as ${data.moduleName} } from './${data.page}/${data.moduleFile}';`);
+            await exportContainers(componentForlderUri, `export { default as ${data.componentName} } from './${data.page}/${data.componentName}';`);
+          }
+        } else {
+          vscode.window.showErrorMessage('Next code generator: Working folder not found, open a folder an try again');
+        }
       }
     }
   });
   context.subscriptions.push(generatePageDisposable);
 
+  // generate module and component
+  const generateNextModuleDisposable = vscode.commands.registerCommand('nextcodegen.generate_module', async () => {
+    const config = await getConfig();
+    const data: { module?: string; moduleName?: string; moduleFile?: string; hasComponent?: boolean; componentName?: string } = {};
+
+    if (config) {
+      const moduleInfo = await vscode.window.showInputBox({
+        prompt: 'Enter module name',
+        placeHolder: 'modulename',
+      });
+
+      if (moduleInfo) {
+        const capitalisedModule = capitalize(moduleInfo);
+        data.moduleName = capitalisedModule + 'Module';
+        data.moduleFile = capitalisedModule + '.module';
+        data.module = moduleInfo.toLowerCase();
+
+        const withComponent = await vscode.window.showInputBox({
+          prompt: 'Do you want to generate a component?',
+          value: 'Yes',
+        });
+        if (withComponent !== 'Yes') {
+          data.hasComponent = false;
+        } else {
+          data.hasComponent = true;
+        }
+        if (data.hasComponent) {
+          data.componentName = capitalisedModule;
+        }
+      } else {
+        vscode.window.showInformationMessage('You canceled the input.');
+      }
+
+      const paths: { modulePath?: string; moduleFolderPath?: string; componentsFolderPath?: string; componentPath?: string } = {};
+      if (vscode.workspace.workspaceFolders !== undefined) {
+        let f = vscode.workspace.workspaceFolders[0].uri.fsPath;
+
+        paths.modulePath = !checkIfEmptyString(config.modulesPath)
+          ? `${f}${config.modulesPath}\\${data.module}`
+          : `${f}\\src\\containers\\modules\\${data.module}`;
+        const moduleUri = vscode.Uri.file(paths.modulePath);
+
+        await createFile(moduleUri, `${data.moduleFile}.tsx`, generateModule(data, config));
+        paths.moduleFolderPath = config.modulesPath ? `${f}${config.modulesPath}` : `${f}\\src\\containers\\modules`;
+        const moduleFolderUri = vscode.Uri.file(paths.moduleFolderPath);
+
+        await exportContainers(moduleFolderUri, `export { default as ${data.moduleName} } from './${data.module}/${data.moduleFile}';`);
+
+        if (data.hasComponent) {
+          paths.componentPath = !checkIfEmptyString(config.componentsPath)
+            ? `${f}${config.componentsPath}\\${data.module}`
+            : `${f}\\src\\containers\\components\\${data.module}`;
+          const componentUri = vscode.Uri.file(paths.componentPath);
+
+          await createFile(componentUri, `${data.componentName}.tsx`, generateComponent(data));
+          await createFile(componentUri, `${data.componentName?.toLowerCase()}.module.scss`, generateCssFile(data));
+          paths.componentsFolderPath = config.componentsPath ? `${f}${config.componentsPath}` : `${f}\\src\\containers\\components`;
+          const componentForlderUri = vscode.Uri.file(paths.componentsFolderPath);
+          await exportContainers(componentForlderUri, `export { default as ${data.componentName} } from './${data.module}/${data.componentName}';`);
+        }
+      } else {
+        vscode.window.showErrorMessage('Next code generator: Working folder not found, open a folder an try again');
+      }
+    }
+  });
+  context.subscriptions.push(generateNextModuleDisposable);
+
+  // generate component
+  const generateNextComponentDisposable = vscode.commands.registerCommand('nextcodegen.generate_component', async context => {
+    const config = await getConfig();
+    const data: { componentName?: string; componentFolder?: string } = {};
+    if (config) {
+      const componentInfo = await vscode.window.showInputBox({
+        prompt: 'Enter component name',
+        placeHolder: 'componentname',
+      });
+
+      if (componentInfo) {
+        data.componentName = capitalize(componentInfo);
+        data.componentFolder = componentInfo.toLowerCase();
+
+        const paths: { componentsFolderPath?: string; componentPath?: string } = {};
+        if (vscode.workspace.workspaceFolders !== undefined) {
+          let f = vscode.workspace.workspaceFolders[0].uri.fsPath;
+
+          paths.componentPath = !checkIfEmptyString(config.componentsPath)
+            ? `${f}${config.componentsPath}\\${data.componentFolder}`
+            : `${f}\\src\\containers\\components\\${data.componentFolder}`;
+          const componentUri = vscode.Uri.file(paths.componentPath);
+
+          await createFile(componentUri, `${data.componentName}.tsx`, generateComponent(data));
+          await createFile(componentUri, `${data.componentName?.toLowerCase()}.module.scss`, generateCssFile(data));
+          paths.componentsFolderPath = config.componentsPath ? `${f}${config.componentsPath}` : `${f}\\src\\containers\\components`;
+          const componentForlderUri = vscode.Uri.file(paths.componentsFolderPath);
+          await exportContainers(componentForlderUri, `export { default as ${data.componentName} } from './${data.componentFolder}/${data.componentName}';`);
+        } else {
+          vscode.window.showErrorMessage('Next code generator: Working folder not found, open a folder an try again');
+        }
+      } else {
+        vscode.window.showInformationMessage('You canceled the input.');
+      }
+    }
+  });
+  context.subscriptions.push(generateNextComponentDisposable);
+
+  // generate config file
   const generateConfigDisposable = vscode.commands.registerCommand('nextcodegen.generate_config', async () => {
     if (vscode.workspace.workspaceFolders !== undefined) {
       let f = vscode.workspace.workspaceFolders[0].uri.fsPath;
@@ -192,4 +302,28 @@ const getFileUri = (filePath: string) => {
       }
     }
   }
+};
+
+const getConfig = async () => {
+  let config: IConfig = {};
+  try {
+    const fileUri = getFileUri('/gen.json');
+    if (fileUri) {
+      config = JSON.parse(await readFileContent(fileUri));
+    }
+  } catch (error) {
+    config = {
+      pagesPath: '',
+      modulesPath: '',
+      componentsPath: '',
+    };
+  }
+
+  const validPath = checkValidConfigPath(config);
+
+  if (!validPath) {
+    vscode.window.showErrorMessage('Invalid paths specified in gen.json file. Path should start from /src directory');
+    return;
+  }
+  return config;
 };

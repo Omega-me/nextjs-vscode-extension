@@ -3,7 +3,7 @@
   "displayName": "Next Code Generator",
   "publisher": "olkenmerxira",
   "description": "",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "repository": {
     "type": "git",
     "url": "https://github.com/Omega-me/nextjs-vscode-extension"
@@ -24,8 +24,26 @@
         "title": "Generate Next Page"
       },
       {
+        "command": "nextcodegen.generate_module",
+        "title": "Generate Next Module"
+      },
+      {
+        "command": "nextcodegen.generate_component",
+        "title": "Generate Next Component"
+      },
+      {
         "command": "nextcodegen.generate_config",
         "title": "Generate Next Config"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "typescript",
+        "path": "./snippets/generate-snippets.json"
+      },
+      {
+        "language": "typescriptreact",
+        "path": "./snippets/generate-snippets.json"
       }
     ]
   },

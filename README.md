@@ -1,5 +1,7 @@
 # Instructions to work with extension
 
+### Generate page with utils, module and component
+
 - Install the .vsix file.
 - Reload vs code `ctrl+shif+p` command and search for `Reload Window` and click enter.
 - Press again `ctrl+shif+p` command and search for `Generate Next Page` and click enter.
@@ -14,9 +16,23 @@
 
 - Alongside it will be generated a utils file per page and if choosed it will be generated a module file and a component file
 
+### Generate only module and component
+
+- Press again `ctrl+shif+p` command and search for `Generate Next Module` and click enter.
+  ![Alt text](assets/10.png)
+- After entering module name type `Yes` if you want to create a component for the module
+  ![Alt text](assets/11.png)
+  ![Alt text](assets/12.png)
+
+### Generate only component
+
+- Press again `ctrl+shif+p` command and search for `Generate Next Component` and click enter.
+  ![Alt text](assets/13.png)
+  ![Alt text](assets/14.png)
+
 # Using custom paths to generate files
 
-- Press `ctrl+shif+p` command and search for `Generate Next Config` and click enter.
+- Press `ctrl+shif+p` command and search for one of commands `Generate Next Config`, `Generate Next Module` or `Generate Next Component` and click enter.
   ![Alt text](assets/7.1.png)
 - A file named `gen.json` will be created to the root of the directory project.
   ![Alt text](assets/8.png)
@@ -33,3 +49,14 @@
   "componentsPath": "/src/containers/customcomponent"
 }
 ```
+
+# Using code snippets to generate content
+
+- use `pg` snippet for generating a next page
+- use `pg-with-mod` snippet for generating a next page with react query and module support
+- use `pg-util-mod-par` snippet for generating a next page utils content with react query support and params interface `(useful if using dynamic routes, and module support)`
+- use `pg-util-par` snippet for generating a next page utils content with params interface `(useful if using dynamic routes)`
+- use `pg-util-mod` snippet for generating a next page utils content with react query support
+- use `pg-util` snippet for generating a next page utils content
+- use `pg-module` snippet for generating a next module content
+- use `pg-component` snippet for generating a next component content

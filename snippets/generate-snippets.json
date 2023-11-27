@@ -1,0 +1,114 @@
+{
+  "Create next js page": {
+    "prefix": "pg",
+    "body": [
+      "import { PageProps } from './utils';",
+      "",
+      "const $1Page = async (props: PageProps) => {",
+      "",
+      "return (<div>$1</div>)",
+      "};",
+      "",
+      "export default $1Page;",
+      "$2"
+    ],
+    "description": "Create a next js page snippet"
+  },
+  "Create next js page with module": {
+    "prefix": "pg-with-mod",
+    "body": [
+      "import { PageProps, prefetchQuery } from './utils';",
+      "import { $1Module } from '@/containers/modules';",
+      "import { HydrationBoundary, dehydrate } from '@tanstack/react-query';",
+      "",
+      "",
+      "const $1Page = async (props: PageProps) => {",
+      "const queryClient = await prefetchQuery(props);",
+      "",
+      "return (",
+      "<HydrationBoundary state={dehydrate(queryClient)}>",
+      "<$1Module />",
+      "</HydrationBoundary>",
+      ")",
+      "};",
+      "",
+      "export default $1Page;",
+      "$2"
+    ],
+    "description": "Create a next js page snippet with module and react query support"
+  },
+  "Create next js utils for a page with module and params": {
+    "prefix": "pg-util-mod-par",
+    "body": [
+      "import { IPageProps } from '@/common/interfaces';",
+      "import { QueryClient } from '@tanstack/react-query';",
+      "",
+      "export interface PageProps extends IPageProps { params: { ${TM_DIRECTORY/.*[\\\\|\\/]+[[...]+(.*)+[\\[(.*?)\\]]/${1: }/}: string[] | string } }",
+      "",
+      "export const prefetchQuery = async (props: PageProps): Promise<QueryClient> => {",
+      "const queryClient = new QueryClient();",
+      "",
+      "return queryClient;",
+      "};"
+    ],
+    "description": "Create a next js page utils snippet with react query support and params for dynamic routing"
+  },
+  "Create next js page utils with params": {
+    "prefix": "pg-util-par",
+    "body": [
+      "import { IPageProps } from '@/common/interfaces';",
+      "",
+      "export interface PageProps extends IPageProps { params: { ${TM_DIRECTORY/.*[\\\\|\\/]+[[...]+(.*)+[\\[(.*?)\\]]/${1: }/}: string[] | string } }"
+    ],
+    "description": "Create a next js page utils snippet with params for dynamic routing"
+  },
+  "Create next js utils for a page with module": {
+    "prefix": "pg-util-mod",
+    "body": [
+      "import { IPageProps } from '@/common/interfaces';",
+      "import { QueryClient } from '@tanstack/react-query';",
+      "",
+      "export interface PageProps extends IPageProps { }",
+      "",
+      "export const prefetchQuery = async (props: PageProps): Promise<QueryClient> => {",
+      "const queryClient = new QueryClient();",
+      "",
+      "return queryClient;",
+      "};"
+    ],
+    "description": "Create a next js page utils snippet with react query support and params for dynamic routing"
+  },
+  "Create next js page utils": {
+    "prefix": "pg-util",
+    "body": ["import { IPageProps } from '@/common/interfaces';", "", "export interface PageProps extends IPageProps { }"],
+    "description": "Create a next js page utils snippet"
+  },
+  "Create next js module": {
+    "prefix": "pg-module",
+    "body": [
+      "'use client';",
+      "import { ${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/} } from '@/containers/components';",
+      "",
+      "const ${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/g} = () => {",
+      "return <${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}/>",
+      "};",
+      "",
+      "export default ${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/g};"
+    ],
+    "description": "Create a next js module snippet"
+  },
+  "Create next js component": {
+    "prefix": "pg-component",
+    "body": [
+      "'use client';",
+      "",
+      "interface ${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}Props{ }",
+      "",
+      "const ${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}:React.FC<${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}Props> = (props) => {",
+      "return <div>${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}</div>;",
+      "};",
+      "export default ${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/};"
+    ],
+    "description": "Create a next js component snippet"
+  }
+}
