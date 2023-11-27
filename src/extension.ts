@@ -8,6 +8,7 @@ import {
   generateComponent,
   generateCssFile,
   generateModule,
+  generateModuleWithoutComponent,
   generatePage,
   generateUtil,
   getPageName,
@@ -155,7 +156,11 @@ export function activate(context: vscode.ExtensionContext) {
           : `${f}\\src\\containers\\modules\\${data.module}`;
         const moduleUri = vscode.Uri.file(paths.modulePath);
 
-        await createFile(moduleUri, `${data.moduleFile}.tsx`, generateModule(data, config));
+        if (data.hasComponent) {
+          await createFile(moduleUri, `${data.moduleFile}.tsx`, generateModule(data, config));
+        } else {
+          await createFile(moduleUri, `${data.moduleFile}.tsx`, generateModuleWithoutComponent(data));
+        }
         paths.moduleFolderPath = config.modulesPath ? `${f}${config.modulesPath}` : `${f}\\src\\containers\\modules`;
         const moduleFolderUri = vscode.Uri.file(paths.moduleFolderPath);
 

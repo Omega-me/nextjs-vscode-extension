@@ -125,6 +125,18 @@ const ${data.moduleName} = () => {
 export default ${data.moduleName};`;
 };
 
+export const generateModuleWithoutComponent = (
+  data: IData | { module?: string; moduleName?: string; moduleFile?: string; hasComponent?: boolean; componentName?: string },
+) => {
+  return `'use client';
+
+const ${data.moduleName} = () => {
+  return <div>${data.moduleName}</div>;
+};
+
+export default ${data.moduleName};`;
+};
+
 export const generateComponent = (
   data: IData | { module?: string; moduleName?: string; moduleFile?: string; hasComponent?: boolean; componentName?: string },
 ) => {
