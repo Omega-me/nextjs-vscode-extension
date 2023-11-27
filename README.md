@@ -54,8 +54,8 @@
 
 - use `pg` snippet for generating a next page
 - use `pg-with-mod` snippet for generating a next page with react query and module support
-- use `pg-util-mod-par` snippet for generating a next page utils content with react query support and params interface `(useful if using dynamic routes, and module support)`
-- use `pg-util-par` snippet for generating a next page utils content with params interface `(useful if using dynamic routes)`
+- use `pg-util-mod-par` snippet for generating a next page utils content with react query support and params interface (useful if using dynamic routes, and module support)
+- use `pg-util-par` snippet for generating a next page utils content with params interface (useful if using dynamic routes)
 - use `pg-util-mod` snippet for generating a next page utils content with react query support
 - use `pg-util` snippet for generating a next page utils content
 - use `pg-module` snippet for generating a next module content
