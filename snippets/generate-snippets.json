@@ -2,9 +2,9 @@
   "Create next js page": {
     "prefix": "pg",
     "body": [
-      "import { PageProps } from './utils';",
+      "import { $1PageProps } from './$1Page.utils';",
       "",
-      "const $1Page = async (props: PageProps) => {",
+      "const $1Page = async (props: $1PageProps) => {",
       "",
       "return (<div>$1</div>)",
       "};",
@@ -17,12 +17,12 @@
   "Create next js page with module": {
     "prefix": "pg-with-mod",
     "body": [
-      "import { PageProps, prefetchQuery } from './utils';",
+      "import { $1PageProps, prefetchQuery } from './$1Page.utils';",
       "import { $1Module } from '@/containers/modules';",
       "import { HydrationBoundary, dehydrate } from '@tanstack/react-query';",
       "",
       "",
-      "const $1Page = async (props: PageProps) => {",
+      "const $1Page = async (props: $1PageProps) => {",
       "const queryClient = await prefetchQuery(props);",
       "",
       "return (",
@@ -43,9 +43,9 @@
       "import { IPageProps } from '@/common/interfaces';",
       "import { QueryClient } from '@tanstack/react-query';",
       "",
-      "export interface PageProps extends IPageProps { params: { ${TM_DIRECTORY/.*[\\\\|\\/]+[[...]+(.*)+[\\[(.*?)\\]]/${1: }/}: string[] | string } }",
+      "export interface ${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}Props extends IPageProps { params: { ${TM_DIRECTORY/.*[\\\\|\\/]+[[...]+(.*)+[\\[(.*?)\\]]/${1: }/}: string[] | string } }",
       "",
-      "export const prefetchQuery = async (props: PageProps): Promise<QueryClient> => {",
+      "export const prefetchQuery = async (props: ${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}Props): Promise<QueryClient> => {",
       "const queryClient = new QueryClient();",
       "",
       "return queryClient;",
@@ -58,7 +58,7 @@
     "body": [
       "import { IPageProps } from '@/common/interfaces';",
       "",
-      "export interface PageProps extends IPageProps { params: { ${TM_DIRECTORY/.*[\\\\|\\/]+[[...]+(.*)+[\\[(.*?)\\]]/${1: }/}: string[] | string } }"
+      "export interface ${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}Props extends IPageProps { params: { ${TM_DIRECTORY/.*[\\\\|\\/]+[[...]+(.*)+[\\[(.*?)\\]]/${1: }/}: string[] | string } }"
     ],
     "description": "Create a next js page utils snippet with params for dynamic routing"
   },
@@ -68,9 +68,9 @@
       "import { IPageProps } from '@/common/interfaces';",
       "import { QueryClient } from '@tanstack/react-query';",
       "",
-      "export interface PageProps extends IPageProps { }",
+      "export interface ${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}Props extends IPageProps { }",
       "",
-      "export const prefetchQuery = async (props: PageProps): Promise<QueryClient> => {",
+      "export const prefetchQuery = async (props: ${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}Props): Promise<QueryClient> => {",
       "const queryClient = new QueryClient();",
       "",
       "return queryClient;",
@@ -80,7 +80,11 @@
   },
   "Create next js page utils": {
     "prefix": "pg-util",
-    "body": ["import { IPageProps } from '@/common/interfaces';", "", "export interface PageProps extends IPageProps { }"],
+    "body": [
+      "import { IPageProps } from '@/common/interfaces';",
+      "",
+      "export interface ${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}Props extends IPageProps { }"
+    ],
     "description": "Create a next js page utils snippet"
   },
   "Create next js module": {

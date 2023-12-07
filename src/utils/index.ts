@@ -51,11 +51,11 @@ export const checkValidConfigPath = (config: IConfig) => {
 export const generatePage = (data: IData, config: IConfig) => {
   let pageContent = '';
   if (data.hasModule) {
-    pageContent = `import { PageProps, prefetchQuery } from './${data.pageName}.utils';
+    pageContent = `import { ${data.pageName}Props, prefetchQuery } from './${data.pageName}.utils';
 import { ${data.moduleName} } from ${!checkIfEmptyString(config.modulesPath) ? "'" + config.modulesPath?.replace('/src', '@') + "'" : "'@/containers/modules'"};
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 
-const ${data.pageName} = async (props: PageProps) => {
+const ${data.pageName} = async (props: ${data.pageName}Props) => {
   const queryClient = await prefetchQuery(props);
 
   return (
@@ -68,9 +68,9 @@ const ${data.pageName} = async (props: PageProps) => {
 export default ${data.pageName};`;
   } else {
     pageContent = `
-import { PageProps } from './utils';
+import { ${data.pageName}Props } from './${data.pageName}.utils';
 
-const ${data.pageName} = async (props: PageProps) => {
+const ${data.pageName} = async (props: ${data.pageName}Props) => {
   return <div>${data.pageName}</div>;
 };
 
@@ -88,11 +88,11 @@ export const generateUtil = (data: IData) => {
     utilContent = `import { IPageProps } from '@/common/interfaces';
 import { QueryClient } from '@tanstack/react-query';
 
-export interface PageProps extends IPageProps {
+export interface ${data.pageName}Props extends IPageProps {
   ${paramsType}
 }
 
-export const prefetchQuery = async (props: PageProps): Promise<QueryClient> => {
+export const prefetchQuery = async (props: ${data.pageName}Props): Promise<QueryClient> => {
   const queryClient = new QueryClient();
     
   return queryClient;
@@ -101,7 +101,7 @@ export const prefetchQuery = async (props: PageProps): Promise<QueryClient> => {
     utilContent = `
 import { IPageProps } from '@/common/interfaces';
   
-export interface PageProps extends IPageProps {
+export interface ${data.pageName}Props extends IPageProps {
   ${paramsType}
 }`;
   }
