@@ -150,43 +150,43 @@ export function activate(context: vscode.ExtensionContext) {
         if (data.hasComponent) {
           data.componentName = capitalisedModule;
         }
+
+        const paths: { modulePath?: string; moduleFolderPath?: string; componentsFolderPath?: string; componentPath?: string } = {};
+        if (vscode.workspace.workspaceFolders !== undefined) {
+          let f = vscode.workspace.workspaceFolders[0].uri.fsPath;
+
+          paths.modulePath = !checkIfEmptyString(config.modulesPath)
+            ? `${f}${config.modulesPath}\\${data.module}`
+            : `${f}\\src\\containers\\modules\\${data.module}`;
+          const moduleUri = vscode.Uri.file(paths.modulePath);
+
+          if (data.hasComponent) {
+            await createFile(moduleUri, `${data.moduleFile}.tsx`, generateModule(data, config));
+          } else {
+            await createFile(moduleUri, `${data.moduleFile}.tsx`, generateModuleWithoutComponent(data));
+          }
+          paths.moduleFolderPath = config.modulesPath ? `${f}${config.modulesPath}` : `${f}\\src\\containers\\modules`;
+          const moduleFolderUri = vscode.Uri.file(paths.moduleFolderPath);
+
+          await exportContainers(moduleFolderUri, `export { default as ${data.moduleName} } from './${data.module}/${data.moduleFile}';`);
+
+          if (data.hasComponent) {
+            paths.componentPath = !checkIfEmptyString(config.componentsPath)
+              ? `${f}${config.componentsPath}\\${data.module}`
+              : `${f}\\src\\containers\\components\\${data.module}`;
+            const componentUri = vscode.Uri.file(paths.componentPath);
+
+            await createFile(componentUri, `${data.componentName}.tsx`, generateComponent(data));
+            await createFile(componentUri, `${data.componentName?.toLowerCase()}.module.scss`, generateCssFile(data));
+            paths.componentsFolderPath = config.componentsPath ? `${f}${config.componentsPath}` : `${f}\\src\\containers\\components`;
+            const componentForlderUri = vscode.Uri.file(paths.componentsFolderPath);
+            await exportContainers(componentForlderUri, `export { default as ${data.componentName} } from './${data.module}/${data.componentName}';`);
+          }
+        } else {
+          vscode.window.showErrorMessage('Next code generator: Working folder not found, open a folder an try again');
+        }
       } else {
         vscode.window.showInformationMessage('You canceled the input.');
-      }
-
-      const paths: { modulePath?: string; moduleFolderPath?: string; componentsFolderPath?: string; componentPath?: string } = {};
-      if (vscode.workspace.workspaceFolders !== undefined) {
-        let f = vscode.workspace.workspaceFolders[0].uri.fsPath;
-
-        paths.modulePath = !checkIfEmptyString(config.modulesPath)
-          ? `${f}${config.modulesPath}\\${data.module}`
-          : `${f}\\src\\containers\\modules\\${data.module}`;
-        const moduleUri = vscode.Uri.file(paths.modulePath);
-
-        if (data.hasComponent) {
-          await createFile(moduleUri, `${data.moduleFile}.tsx`, generateModule(data, config));
-        } else {
-          await createFile(moduleUri, `${data.moduleFile}.tsx`, generateModuleWithoutComponent(data));
-        }
-        paths.moduleFolderPath = config.modulesPath ? `${f}${config.modulesPath}` : `${f}\\src\\containers\\modules`;
-        const moduleFolderUri = vscode.Uri.file(paths.moduleFolderPath);
-
-        await exportContainers(moduleFolderUri, `export { default as ${data.moduleName} } from './${data.module}/${data.moduleFile}';`);
-
-        if (data.hasComponent) {
-          paths.componentPath = !checkIfEmptyString(config.componentsPath)
-            ? `${f}${config.componentsPath}\\${data.module}`
-            : `${f}\\src\\containers\\components\\${data.module}`;
-          const componentUri = vscode.Uri.file(paths.componentPath);
-
-          await createFile(componentUri, `${data.componentName}.tsx`, generateComponent(data));
-          await createFile(componentUri, `${data.componentName?.toLowerCase()}.module.scss`, generateCssFile(data));
-          paths.componentsFolderPath = config.componentsPath ? `${f}${config.componentsPath}` : `${f}\\src\\containers\\components`;
-          const componentForlderUri = vscode.Uri.file(paths.componentsFolderPath);
-          await exportContainers(componentForlderUri, `export { default as ${data.componentName} } from './${data.module}/${data.componentName}';`);
-        }
-      } else {
-        vscode.window.showErrorMessage('Next code generator: Working folder not found, open a folder an try again');
       }
     }
   });
