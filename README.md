@@ -4,6 +4,9 @@
 
 - Install the .vsix file.
 - Reload vs code `ctrl+shif+p` command and search for `Reload Window` and click enter.
+- New collapsable option will show on the explorer tab.
+  ![Alt text](assets/15.png)
+- Other ways to use the extension.
 - Press again `ctrl+shif+p` command and search for `Generate Next Page` and click enter.
   ![Alt text](assets/1.png)
 - It will open an input where you can specify the page path, for example `foo/bar` and the page will be created on the directory `bar` inside the `foo` directory, to create dynamic routes you can specify the path just witht the format of a dynamic route for example `foo/bar/[fooid]` and it will generate a page folder `[fooid]`.
