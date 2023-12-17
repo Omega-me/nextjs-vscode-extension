@@ -87,6 +87,34 @@
     ],
     "description": "Create a next js page utils snippet"
   },
+  "Create next js module with context api ": {
+    "prefix": "pg-module-ctx",
+    "body": [
+      "'use client';",
+      "import { createContext, useContext } from 'react';",
+      "import { ${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/} } from '@/containers/components';",
+      "",
+      "export interface ${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/g}InjectedProps {}",
+      "",
+      "const ${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/g}Context = createContext<${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/g}InjectedProps>({});",
+      "",
+      "export const use${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/g}Context = () => {",
+      "const ctx = useContext<${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/g}InjectedProps>(${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/g}Context);",
+      "return ctx;",
+      "};",
+      "",
+      "const ${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/g} = () => {",
+      "return (",
+      "<${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/g}Context.Provider value={{}}>",
+      "<${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}/>",
+      "</${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/g}Context.Provider>",
+      ")",
+      "};",
+      "",
+      "export default ${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/g};"
+    ],
+    "description": "Create a next js module snippet with react context api support"
+  },
   "Create next js module": {
     "prefix": "pg-module",
     "body": [
@@ -101,15 +129,34 @@
     ],
     "description": "Create a next js module snippet"
   },
-  "Create next js component": {
-    "prefix": "pg-component",
+  "Create next js component with context api": {
+    "prefix": "pg-component-ctx",
     "body": [
       "'use client';",
+      "import { use${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/g}ModuleContext } from '@/containers/modules/${TM_FILENAME_BASE/([^.]+).*/${1:/downcase}/}/${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}.module';",
+      "import s from './${TM_FILENAME_BASE/([^.]+).*/${1:/downcase}/}.module.scss';",
       "",
       "interface ${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}Props{ }",
       "",
       "const ${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}:React.FC<${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}Props> = (props) => {",
-      "return <div>${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}</div>;",
+      "const {} = use${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/g}ModuleContext();",
+      "",
+      "return <div className={s.${TM_FILENAME_BASE/([^.]+).*/${1:/downcase}/}}>${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}</div>;",
+      "};",
+      "export default ${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/};"
+    ],
+    "description": "Create a next js component snippet with react context api support from the module"
+  },
+  "Create next js component": {
+    "prefix": "pg-component",
+    "body": [
+      "'use client';",
+      "import s from './${TM_FILENAME_BASE/([^.]+).*/${1:/downcase}/}.module.scss';",
+      "",
+      "interface ${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}Props{ }",
+      "",
+      "const ${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}:React.FC<${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}Props> = (props) => {",
+      "return <div className={s.${TM_FILENAME_BASE/([^.]+).*/${1:/downcase}/}}>${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}</div>;",
       "};",
       "export default ${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/};"
     ],

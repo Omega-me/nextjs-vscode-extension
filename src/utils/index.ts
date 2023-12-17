@@ -5,6 +5,7 @@ export interface IData {
   pagePath?: string;
   pageName?: string;
   hasModule?: boolean;
+  hasContext?: boolean;
   componentName?: string;
   moduleName?: string;
   moduleFile?: string;
@@ -110,46 +111,116 @@ export interface ${data.pageName}Props extends IPageProps {
 };
 
 export const generateModule = (
-  data: IData | { module?: string; moduleName?: string; moduleFile?: string; hasComponent?: boolean; componentName?: string },
+  data: IData | { module?: string; moduleName?: string; moduleFile?: string; hasComponent?: boolean; componentName?: string; hasContext?: boolean },
   config: IConfig,
 ) => {
-  return `'use client';
+  if (data.hasContext) {
+    return `'use client';
+import { createContext, useContext } from 'react';
 import { ${data.componentName} } from ${
-    !checkIfEmptyString(config.componentsPath) ? "'" + config.componentsPath?.replace('/src', '@') + "'" : "'@/containers/components'"
-  };
+      !checkIfEmptyString(config.componentsPath) ? "'" + config.componentsPath?.replace('/src', '@') + "'" : "'@/containers/components'"
+    };
+  
+export interface ${data.moduleName}InjectedProps {}
 
+const ${data.moduleName}Context = createContext<${data.moduleName}InjectedProps>({});
+
+export const use${data.moduleName}Context = () => {
+  const ctx = useContext<${data.moduleName}InjectedProps>(${data.moduleName}Context);
+  return ctx;
+};
+
+const ${data.moduleName} = () => {
+  return (
+    <${data.moduleName}Context.Provider value={{}}>
+      <${data.componentName} />
+    </${data.moduleName}Context.Provider>
+  );
+};
+
+export default ${data.moduleName};`;
+  } else {
+    return `'use client';
+import { ${data.componentName} } from ${
+      !checkIfEmptyString(config.componentsPath) ? "'" + config.componentsPath?.replace('/src', '@') + "'" : "'@/containers/components'"
+    };
+  
 const ${data.moduleName} = () => {
   return <${data.componentName} />;
 };
-
+  
 export default ${data.moduleName};`;
+  }
 };
 
 export const generateModuleWithoutComponent = (
-  data: IData | { module?: string; moduleName?: string; moduleFile?: string; hasComponent?: boolean; componentName?: string },
+  data: IData | { module?: string; moduleName?: string; moduleFile?: string; hasComponent?: boolean; componentName?: string; hasContext?: boolean },
 ) => {
-  return `'use client';
+  if (data.hasContext) {
+    return `'use client';
+import { createContext, useContext } from 'react';
+  
+export interface ${data.moduleName}InjectedProps {}
+
+const ${data.moduleName}Context = createContext<${data.moduleName}InjectedProps>({});
+
+export const use${data.moduleName}Context = () => {
+  const ctx = useContext<${data.moduleName}InjectedProps>(${data.moduleName}Context);
+  return ctx;
+};
 
 const ${data.moduleName} = () => {
-  return <div>${data.moduleName}</div>;
+  return (
+    <${data.moduleName}Context.Provider value={{}}>${data.moduleName}</${data.moduleName}Context.Provider>
+  );
 };
 
 export default ${data.moduleName};`;
+  } else {
+    return `'use client';
+  
+const ${data.moduleName} = () => {
+  return <div>${data.moduleName}</div>;
+};
+  
+export default ${data.moduleName};`;
+  }
 };
 
 export const generateComponent = (
-  data: IData | { module?: string; moduleName?: string; moduleFile?: string; hasComponent?: boolean; componentName?: string },
+  data: IData | { module?: string; moduleName?: string; moduleFile?: string; hasComponent?: boolean; componentName?: string; hasContext?: boolean },
+  config: IConfig,
 ) => {
-  return `'use client';
+  if (data.hasContext) {
+    return `'use client';
+import { use${data.componentName}ModuleContext } from ${
+      !checkIfEmptyString(config.modulesPath)
+        ? "'" + config.modulesPath?.replace('/src', '@') + `/${data.componentName?.toLowerCase()}/${data.componentName}.module'`
+        : `'@/containers/modules/${data.componentName?.toLowerCase()}/${data.componentName}.module'`
+    };
 import s from './${data.componentName?.toLowerCase()}.module.scss';
-
+    
 interface ${data.componentName}Props {}
-
+    
+const ${data.componentName}: React.FC<${data.componentName}Props> = props => {
+  const {} = use${data.componentName}ModuleContext();
+      
+  return <div className={s.${data.componentName?.toLowerCase()}}>${data.componentName}</div>;
+};
+    
+export default ${data.componentName};`;
+  } else {
+    return `'use client';
+import s from './${data.componentName?.toLowerCase()}.module.scss';
+  
+interface ${data.componentName}Props {}
+  
 const ${data.componentName}: React.FC<${data.componentName}Props> = props => {
   return <div className={s.${data.componentName?.toLowerCase()}}>${data.componentName}</div>;
 };
-
+  
 export default ${data.componentName};`;
+  }
 };
 
 export const generateCssFile = (

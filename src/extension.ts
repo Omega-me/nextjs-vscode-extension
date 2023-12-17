@@ -63,12 +63,17 @@ export function activate(context: vscode.ExtensionContext) {
         }
         pascalPage = capitalize(data.pageOriginalName);
         data.pageName = pascalPage + 'Page';
-        const moduleChecker = await vscode.window.showInputBox({
+        const withModule = await vscode.window.showInputBox({
           prompt: 'Does page has a module and react query support?',
           value: 'Yes',
         });
-        data.hasModule = moduleChecker === 'Yes' ? true : false;
+        data.hasModule = withModule?.toUpperCase().trim() === 'YES' ? true : false;
         if (data.hasModule) {
+          const withContext = await vscode.window.showInputBox({
+            prompt: 'Do you want to use react context api for injecting props to the child components?',
+            value: 'No',
+          });
+          data.hasContext = withContext?.toUpperCase().trim() === 'NO' ? false : true;
           data.moduleName = `${pascalPage}Module`;
           data.moduleFile = `${pascalPage}.module`;
           data.componentName = pascalPage;
@@ -102,7 +107,7 @@ export function activate(context: vscode.ExtensionContext) {
             const componentUri = vscode.Uri.file(paths.componentPath);
 
             await createFile(moduleUri, `${data.moduleFile}.tsx`, generateModule(data, config));
-            await createFile(componentUri, `${data.componentName}.tsx`, generateComponent(data));
+            await createFile(componentUri, `${data.componentName}.tsx`, generateComponent(data, config));
             await createFile(componentUri, `${data.componentName?.toLowerCase()}.module.scss`, generateCssFile(data));
 
             // export module and component file
@@ -124,7 +129,7 @@ export function activate(context: vscode.ExtensionContext) {
   // generate module and component
   const generateNextModuleDisposable = vscode.commands.registerCommand('nextcodegen.generate_module', async () => {
     const config = await getConfig();
-    const data: { module?: string; moduleName?: string; moduleFile?: string; hasComponent?: boolean; componentName?: string } = {};
+    const data: { module?: string; moduleName?: string; moduleFile?: string; hasComponent?: boolean; componentName?: string; hasContext?: boolean } = {};
 
     if (config) {
       const moduleInfo = await vscode.window.showInputBox({
@@ -138,15 +143,17 @@ export function activate(context: vscode.ExtensionContext) {
         data.moduleFile = capitalisedModule + '.module';
         data.module = moduleInfo.toLowerCase();
 
+        const withContext = await vscode.window.showInputBox({
+          prompt: 'Do you want to use react context api for injecting props to the child components?',
+          value: 'No',
+        });
+        data.hasContext = withContext?.toUpperCase().trim() === 'NO' ? false : true;
+
         const withComponent = await vscode.window.showInputBox({
           prompt: 'Do you want to generate a component?',
           value: 'Yes',
         });
-        if (withComponent !== 'Yes') {
-          data.hasComponent = false;
-        } else {
-          data.hasComponent = true;
-        }
+        data.hasComponent = withComponent?.toUpperCase().trim() === 'YES' ? true : false;
         if (data.hasComponent) {
           data.componentName = capitalisedModule;
         }
@@ -176,7 +183,7 @@ export function activate(context: vscode.ExtensionContext) {
               : `${f}\\src\\containers\\components\\${data.module}`;
             const componentUri = vscode.Uri.file(paths.componentPath);
 
-            await createFile(componentUri, `${data.componentName}.tsx`, generateComponent(data));
+            await createFile(componentUri, `${data.componentName}.tsx`, generateComponent(data, config));
             await createFile(componentUri, `${data.componentName?.toLowerCase()}.module.scss`, generateCssFile(data));
             paths.componentsFolderPath = config.componentsPath ? `${f}${config.componentsPath}` : `${f}\\src\\containers\\components`;
             const componentForlderUri = vscode.Uri.file(paths.componentsFolderPath);
@@ -195,7 +202,7 @@ export function activate(context: vscode.ExtensionContext) {
   // generate component
   const generateNextComponentDisposable = vscode.commands.registerCommand('nextcodegen.generate_component', async context => {
     const config = await getConfig();
-    const data: { componentName?: string; componentFolder?: string } = {};
+    const data: { componentName?: string; componentFolder?: string; hasContext?: boolean } = {};
     if (config) {
       const componentInfo = await vscode.window.showInputBox({
         prompt: 'Enter component name',
@@ -206,6 +213,12 @@ export function activate(context: vscode.ExtensionContext) {
         data.componentName = capitalize(componentInfo);
         data.componentFolder = componentInfo.toLowerCase();
 
+        const withContext = await vscode.window.showInputBox({
+          prompt: 'Do you want to use react context api import from module?',
+          value: 'No',
+        });
+        data.hasContext = withContext?.toUpperCase().trim() === 'NO' ? false : true;
+
         const paths: { componentsFolderPath?: string; componentPath?: string } = {};
         if (vscode.workspace.workspaceFolders !== undefined) {
           let f = vscode.workspace.workspaceFolders[0].uri.fsPath;
@@ -215,7 +228,7 @@ export function activate(context: vscode.ExtensionContext) {
             : `${f}\\src\\containers\\components\\${data.componentFolder}`;
           const componentUri = vscode.Uri.file(paths.componentPath);
 
-          await createFile(componentUri, `${data.componentName}.tsx`, generateComponent(data));
+          await createFile(componentUri, `${data.componentName}.tsx`, generateComponent(data, config));
           await createFile(componentUri, `${data.componentName?.toLowerCase()}.module.scss`, generateCssFile(data));
           paths.componentsFolderPath = config.componentsPath ? `${f}${config.componentsPath}` : `${f}\\src\\containers\\components`;
           const componentForlderUri = vscode.Uri.file(paths.componentsFolderPath);
@@ -250,12 +263,12 @@ export function activate(context: vscode.ExtensionContext) {
                 prompt: 'Config file exists, do you want to recreate it?',
                 value: 'Yes',
               });
-              if (answer1 === 'Yes') {
+              if (answer1?.toUpperCase().trim() === 'YES') {
                 const answer2 = await vscode.window.showInputBox({
                   prompt: 'Your older config file will be erased, do you want to proceed?',
                   value: 'Yes',
                 });
-                if (answer2 === 'Yes') {
+                if (answer2?.toUpperCase().trim() === 'YES') {
                   await createFile(pathUri, 'gen.json', JSON.stringify(newConfig));
                 }
               }
@@ -339,7 +352,6 @@ const getConfig = async () => {
   }
   return config;
 };
-
 class ViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'nextcodegen.gen_view';
 
