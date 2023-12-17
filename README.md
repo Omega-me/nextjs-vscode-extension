@@ -62,4 +62,6 @@
 - use `pg-util-mod` snippet for generating a next page utils content with react query support
 - use `pg-util` snippet for generating a next page utils content
 - use `pg-module` snippet for generating a next module content
+- use `pg-module-ctx` snippet for generating a next module content with react context api provider
 - use `pg-component` snippet for generating a next component content
+- use `pg-component-ctx` snippet for generating a next component content with react context api provider hook imported
