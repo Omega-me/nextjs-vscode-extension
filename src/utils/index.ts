@@ -193,6 +193,7 @@ export const generateComponent = (
 ) => {
   if (data.hasContext) {
     return `'use client';
+import { memo } from 'react';
 import { use${data.componentName}ModuleContext } from ${
       !checkIfEmptyString(config.modulesPath)
         ? "'" + config.modulesPath?.replace('/src', '@') + `/${data.componentName?.toLowerCase()}/${data.componentName}.module'`
@@ -208,9 +209,10 @@ const ${data.componentName}: React.FC<${data.componentName}Props> = props => {
   return <div className={s.${data.componentName?.toLowerCase()}}>${data.componentName}</div>;
 };
     
-export default ${data.componentName};`;
+export default memo(${data.componentName});`;
   } else {
     return `'use client';
+import { memo } from 'react';
 import s from './${data.componentName?.toLowerCase()}.module.scss';
   
 interface ${data.componentName}Props {}
@@ -219,7 +221,7 @@ const ${data.componentName}: React.FC<${data.componentName}Props> = props => {
   return <div className={s.${data.componentName?.toLowerCase()}}>${data.componentName}</div>;
 };
   
-export default ${data.componentName};`;
+export default memo(${data.componentName});`;
   }
 };
 

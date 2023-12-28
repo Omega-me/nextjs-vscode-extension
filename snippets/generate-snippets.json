@@ -133,6 +133,7 @@
     "prefix": "pg-component-ctx",
     "body": [
       "'use client';",
+      "import { memo } from 'react';",
       "import { use${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/g}ModuleContext } from '@/containers/modules/${TM_FILENAME_BASE/([^.]+).*/${1:/downcase}/}/${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}.module';",
       "import s from './${TM_FILENAME_BASE/([^.]+).*/${1:/downcase}/}.module.scss';",
       "",
@@ -143,7 +144,7 @@
       "",
       "return <div className={s.${TM_FILENAME_BASE/([^.]+).*/${1:/downcase}/}}>${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}</div>;",
       "};",
-      "export default ${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/};"
+      "export default memo(${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/});"
     ],
     "description": "Create a next js component snippet with react context api support from the module"
   },
@@ -151,6 +152,7 @@
     "prefix": "pg-component",
     "body": [
       "'use client';",
+      "import { memo } from 'react';",
       "import s from './${TM_FILENAME_BASE/([^.]+).*/${1:/downcase}/}.module.scss';",
       "",
       "interface ${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}Props{ }",
@@ -158,7 +160,7 @@
       "const ${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}:React.FC<${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}Props> = (props) => {",
       "return <div className={s.${TM_FILENAME_BASE/([^.]+).*/${1:/downcase}/}}>${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}</div>;",
       "};",
-      "export default ${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/};"
+      "export default memo(${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/});"
     ],
     "description": "Create a next js component snippet"
   }
