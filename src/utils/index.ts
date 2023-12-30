@@ -116,25 +116,16 @@ export const generateModule = (
 ) => {
   if (data.hasContext) {
     return `'use client';
-import { createContext, useContext } from 'react';
+import { ${data.moduleName}Provider } from '@/common/providers';
 import { ${data.componentName} } from ${
       !checkIfEmptyString(config.componentsPath) ? "'" + config.componentsPath?.replace('/src', '@') + "'" : "'@/containers/components'"
     };
   
-export interface ${data.moduleName}InjectedProps {}
-
-const ${data.moduleName}Context = createContext<${data.moduleName}InjectedProps>({});
-
-export const use${data.moduleName}Context = () => {
-  const ctx = useContext<${data.moduleName}InjectedProps>(${data.moduleName}Context);
-  return ctx;
-};
-
 const ${data.moduleName} = () => {
   return (
-    <${data.moduleName}Context.Provider value={{}}>
+    <${data.moduleName}Provider value={{}}>
       <${data.componentName} />
-    </${data.moduleName}Context.Provider>
+    </${data.moduleName}Provider>
   );
 };
 
@@ -158,20 +149,11 @@ export const generateModuleWithoutComponent = (
 ) => {
   if (data.hasContext) {
     return `'use client';
-import { createContext, useContext } from 'react';
-  
-export interface ${data.moduleName}InjectedProps {}
-
-const ${data.moduleName}Context = createContext<${data.moduleName}InjectedProps>({});
-
-export const use${data.moduleName}Context = () => {
-  const ctx = useContext<${data.moduleName}InjectedProps>(${data.moduleName}Context);
-  return ctx;
-};
+import { ${data.moduleName}Provider } from '@/common/providers';
 
 const ${data.moduleName} = () => {
   return (
-    <${data.moduleName}Context.Provider value={{}}>${data.moduleName}</${data.moduleName}Context.Provider>
+    <${data.moduleName}Provider value={{}}>${data.moduleName}</${data.moduleName}Provider>
   );
 };
 
@@ -193,12 +175,7 @@ export const generateComponent = (
 ) => {
   if (data.hasContext) {
     return `'use client';
-import { memo } from 'react';
-import { use${data.componentName}ModuleContext } from ${
-      !checkIfEmptyString(config.modulesPath)
-        ? "'" + config.modulesPath?.replace('/src', '@') + `/${data.componentName?.toLowerCase()}/${data.componentName}.module'`
-        : `'@/containers/modules/${data.componentName?.toLowerCase()}/${data.componentName}.module'`
-    };
+import { use${data.componentName}ModuleContext } from '@/common/providers';
 import s from './${data.componentName?.toLowerCase()}.module.scss';
     
 interface ${data.componentName}Props {}
@@ -209,7 +186,7 @@ const ${data.componentName}: React.FC<${data.componentName}Props> = props => {
   return <div className={s.${data.componentName?.toLowerCase()}}>${data.componentName}</div>;
 };
     
-export default memo(${data.componentName});`;
+export default ${data.componentName};`;
   } else {
     return `'use client';
 import { memo } from 'react';
@@ -223,6 +200,30 @@ const ${data.componentName}: React.FC<${data.componentName}Props> = props => {
   
 export default memo(${data.componentName});`;
   }
+};
+
+export const generateProviderFile = (
+  data: IData | { module?: string; moduleName?: string; moduleFile?: string; hasComponent?: boolean; componentName?: string },
+) => {
+  return `'use client';
+import { createContext, useContext } from 'react';
+
+interface ${data.moduleName}InjectedProps {}
+interface ${data.moduleName}ProviderProps {
+  children: React.ReactNode;
+  value: ${data.moduleName}InjectedProps;
+}
+
+const ${data.moduleName}Context = createContext<${data.moduleName}InjectedProps>({});
+
+export const use${data.moduleName}Context = () => {
+  const ctx = useContext<${data.moduleName}InjectedProps>(${data.moduleName}Context);
+  return ctx;
+};
+
+export const ${data.moduleName}Provider: React.FC<${data.moduleName}ProviderProps> = props => {
+  return <${data.moduleName}Context.Provider value={props.value}>{props.children}</${data.moduleName}Context.Provider>;
+};`;
 };
 
 export const generateCssFile = (

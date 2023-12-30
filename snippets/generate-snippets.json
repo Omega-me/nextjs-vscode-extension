@@ -91,23 +91,14 @@
     "prefix": "pg-module-ctx",
     "body": [
       "'use client';",
-      "import { createContext, useContext } from 'react';",
+      "import { ${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/g}Provider } from '@/common/providers';",
       "import { ${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/} } from '@/containers/components';",
-      "",
-      "export interface ${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/g}InjectedProps {}",
-      "",
-      "const ${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/g}Context = createContext<${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/g}InjectedProps>({});",
-      "",
-      "export const use${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/g}Context = () => {",
-      "const ctx = useContext<${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/g}InjectedProps>(${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/g}Context);",
-      "return ctx;",
-      "};",
       "",
       "const ${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/g} = () => {",
       "return (",
-      "<${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/g}Context.Provider value={{}}>",
+      "<${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/g}Provider value={{}}>",
       "<${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}/>",
-      "</${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/g}Context.Provider>",
+      "</${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/g}Provider>",
       ")",
       "};",
       "",
@@ -133,8 +124,7 @@
     "prefix": "pg-component-ctx",
     "body": [
       "'use client';",
-      "import { memo } from 'react';",
-      "import { use${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/g}ModuleContext } from '@/containers/modules/${TM_FILENAME_BASE/([^.]+).*/${1:/downcase}/}/${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}.module';",
+      "import { use${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/g}ModuleContext } from '@/common/providers'",
       "import s from './${TM_FILENAME_BASE/([^.]+).*/${1:/downcase}/}.module.scss';",
       "",
       "interface ${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}Props{ }",
@@ -144,7 +134,7 @@
       "",
       "return <div className={s.${TM_FILENAME_BASE/([^.]+).*/${1:/downcase}/}}>${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}</div>;",
       "};",
-      "export default memo(${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/});"
+      "export default ${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/};"
     ],
     "description": "Create a next js component snippet with react context api support from the module"
   },
@@ -163,5 +153,30 @@
       "export default memo(${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/});"
     ],
     "description": "Create a next js component snippet"
+  },
+  "Create next js module provider": {
+    "prefix": "pg-provider-ctx",
+    "body": [
+      "'use client';",
+      "import { createContext, useContext } from 'react';",
+      "",
+      "interface ${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}InjectedProps {}",
+      "interface ${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}ProviderProps {",
+      "children: React.ReactNode;",
+      "value: ${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}InjectedProps;",
+      "}",
+      "",
+      "const ${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}Context = createContext<${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}InjectedProps>({});",
+      "",
+      "export const use${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}Context = () => {",
+      "const ctx = useContext<${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}InjectedProps>(${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}Context);",
+      "return ctx;",
+      "};",
+      "",
+      "export const ${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}Provider: React.FC<${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}ProviderProps> = props => {",
+      "return <${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}Context.Provider value={props.value}>{props.children}</${TM_FILENAME_BASE/([^.]+).*/${1:/pascalcase}/}Context.Provider>;",
+      "};"
+    ],
+    "description": "Create a next js context provider for the module"
   }
 }

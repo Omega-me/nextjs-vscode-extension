@@ -1,5 +1,7 @@
 # Instructions to work with extension
 
+To activate the extension to work with the next js project add `"activate_nextjs_extension": true` to the `package.json` file.
+
 ### Generate page with utils, module and component
 
 - Install the .vsix file.
@@ -63,5 +65,6 @@
 - use `pg-util` snippet for generating a next page utils content
 - use `pg-module` snippet for generating a next module content
 - use `pg-module-ctx` snippet for generating a next module content with react context api provider
+- use `pg-provider-ctx` snippet for generating a react context api provider content for the module
 - use `pg-component` snippet for generating a next component content
 - use `pg-component-ctx` snippet for generating a next component content with react context api provider hook imported
