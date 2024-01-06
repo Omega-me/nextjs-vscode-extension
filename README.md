@@ -7,7 +7,6 @@ To activate the extension to work with the next js project add `"activate_nextjs
 - Install the .vsix file.
 - Reload vs code `ctrl+shif+p` command and search for `Reload Window` and click enter.
 - New collapsable option will show on the explorer tab.
-  ![Alt text](assets/15.png)
 - To activate the extension click on `Activate` button as shown.
   ![Alt text](assets/16.png)
 - `package.json` file will be updated with new option `activate_nextjs_extension`.
