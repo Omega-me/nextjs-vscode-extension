@@ -54,6 +54,14 @@
         "title": "Generate Next Config"
       },
       {
+        "command": "nextcodegen.generate_activate_extension",
+        "title": "Activate Extension"
+      },
+      {
+        "command": "nextcodegen.generate_deactivate_extension",
+        "title": "Deactivate Extension"
+      },
+      {
         "command": "nextcodegen.welcome",
         "title": "Next js code generator"
       }

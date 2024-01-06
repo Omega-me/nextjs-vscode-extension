@@ -34,6 +34,8 @@
       case 'createConfig':
         createConfig();
         break;
+      default:
+        break;
     }
   });
 

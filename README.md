@@ -8,6 +8,15 @@ To activate the extension to work with the next js project add `"activate_nextjs
 - Reload vs code `ctrl+shif+p` command and search for `Reload Window` and click enter.
 - New collapsable option will show on the explorer tab.
   ![Alt text](assets/15.png)
+- To activate the extension click on `Activate` button as shown.
+  ![Alt text](assets/16.png)
+- `package.json` file will be updated with new option `activate_nextjs_extension`.
+  ![Alt text](assets/19.png)
+- To deactivate the extension click on `Deactivate` button as shown.
+  ![Alt text](assets/18.png)
+- The `activate_nextjs_extension` option from `package.json` file will be set to `false`.
+  ![Alt text](assets/17.png)
+- Note that if you remove `activate_nextjs_extension` from `package.json` the extension it will be deactivated.
 - Other ways to use the extension.
 - Press again `ctrl+shif+p` command and search for `Generate Next Page` and click enter.
   ![Alt text](assets/1.png)
